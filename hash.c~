@@ -11,25 +11,24 @@ extern unsigned int hash(const char *str, int table_size)
 
 extern struct hash_table *init_hash(int table_size)
 {
-	struct hash_table *H;
+        struct hash_table *H;
 	if (table_size < MIN_SIZE) {
 		printf("table size too small(<29)\n");
 		exit(EXIT_FAILURE);
 	}
-	H = (struct hash_table *) malloc(sizeof(struct hash_table));
+	H = (struct hash_table *)malloc(sizeof(struct hash_table));
 	if (H == NULL) {
 		ERROR_SPACE();
 		exit(EXIT_FAILURE);
 	}
 	H->table_size = next_prime(table_size);
-	H->list =
-	    (struct node **) malloc(sizeof(struct node *) * H->table_size);
+	H->list = (struct node **)malloc(sizeof(struct node *) * H->table_size);
 	if (H->list == NULL) {
 		ERROR_SPACE();
-		exit(EXIT_FAILURE);
+                exit(EXIT_FAILURE);
 	}
 	for (int i = 0; i < H->table_size; i++) {
-		H->list[i] = (struct node *) malloc(sizeof(struct node));
+		H->list[i] = (struct node *)malloc(sizeof(struct node));
 		if (H->list[i] == NULL) {
 			ERROR_SPACE();
 			exit(EXIT_FAILURE);
@@ -43,7 +42,7 @@ extern struct hash_table *init_hash(int table_size)
 extern void destory_hash(struct hash_table *h)
 {
 	for (int i = 0; i < h->table_size; i++) {
-		free(h->list[i]);
+	        free(h->list[i]);
 	}
 	free(h);
 
@@ -70,7 +69,7 @@ extern void put(data_t key, struct hash_table *h)
 	pos = contain(key, h);
 	/* 不在散列表中 */
 	if (pos == NULL) {
-		new_node = (struct node *) malloc(sizeof(struct node));
+		new_node = (struct node *)malloc(sizeof(struct node));
 		if (new_node == NULL) {
 			ERROR_SPACE();
 			exit(EXIT_FAILURE);
