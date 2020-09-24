@@ -1,5 +1,6 @@
 #include "hash.h"
 #include "hash.c"
+
 int main()
 {
     struct hash_map * H;

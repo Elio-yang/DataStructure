@@ -41,14 +41,14 @@ extern struct hash_map * init_hash(int table_size)
     }
     return H;
 }
-extern void destory_hash(struct hash_map *h)
+extern void destory_hashmap(struct hash_map *H)
 {
-    for(int i=0;i<h->table_size;i++){
-        free(h->list[i]);
+    for(int i=0;i<H->table_size;i++){
+        free(H->list[i]);
     }
-    free(h);
+    free(H);
 }
-extern struct node *contain(data_t key,struct hash_map *h)
+extern struct node *contain(data_t key,struct hash_map *H)
 {
     struct node *pos;
     struct node *head;
@@ -59,13 +59,13 @@ extern struct node *contain(data_t key,struct hash_map *h)
     }
     return pos;
 }
-extern void put(data_t key,struct hash_map *h)
+extern void put(data_t key,struct hash_map *H)
 {
     struct node *pos;
     struct node *new_node;
     struct node *head;
 
-    pos=contain(key,h);
+    pos=contain(key,H);
     /*不在散列表中*/
     if(pos==NULL){
         new_node=(struct node *)malloc(sizeof(struct node));
@@ -73,7 +73,7 @@ extern void put(data_t key,struct hash_map *h)
             printf("Out of space!\n");
             exit(EXIT_FAILURE);
         }else{
-            head=h->list[hash(key,h->table_size)];
+            head=H->list[hash(key,H->table_size)];
             new_node->data=key;
             new_node->next=head->next;
             head->next=new_node;
@@ -100,3 +100,59 @@ extern int is_prime(int n)
     }
     return 1;
 }
+
+extern struct hashmap_square * init_square_hash(int table_size)
+{
+    struct hashmap_square *H;
+    if(table_size<MIN_SIZE){
+        printf("table size too small(<29)\n");
+        exit(EXIT_FAILURE);
+    }
+    H=(struct hashmap_square*)malloc(sizeof(struct hashmap_square));
+     if(H==NULL){
+        printf("Out of space!\n");
+        exit(EXIT_FAILURE);
+    }
+    H->table_size=next_prime(table_size);
+    H->cells=(struct hash_cell*)malloc(sizeof(struct hash_cell)*H->table_size);
+    if(H->cells==NULL){
+        printf("Out of space");
+        exit(EXIT_FAILURE);
+    }
+    for(int i=0;i<H->table_size;i++){
+        H->cells[i].State=Empty;
+    }
+    return H;
+}
+extern void destory_square_hashmap(struct hashmap_square *H)
+{
+    for(int i=0;i<H->table_size;i++){
+        free(H->cells);
+    }
+    free(H);
+}
+
+extern int contain_square(data_t key,struct hashmap_square *H)
+{
+    int pos;
+    int cnt_collison=0;
+    pos=hash(key,H->table_size);
+    while(H->cells[pos].State!=Empty&&strcmp(H->cells[pos].data,key)!=0){
+        pos+=pos + 2 * ++cnt_collison-1;
+        if(pos>=H->table_size){
+            pos= pos- H->table_size;
+        }
+    }
+    if(H->cells[pos].State=Empty){
+        return 0;
+
+    }
+}
+
+extern void put_square(data_t key,struct hashmap_square *H)
+{
+    int pos;
+    int cnt_collison=0;
+    
+
+} 
