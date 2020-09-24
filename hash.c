@@ -20,14 +20,14 @@ extern struct hash_map * init_hash(int table_size)
     }
     H=(struct hash_map *)malloc(sizeof(struct hash_map));
     if(H==NULL){
-        printf("Out of space!\n");
+        SPACE_ERR();
         exit(EXIT_FAILURE);
     }
     H->table_size=next_prime(table_size);
     H->list=
         (struct node**)malloc(sizeof(struct node*)*H->table_size);
     if(H->list==NULL){
-        printf("Out of space");
+        SPACE_ERR();
         exit(EXIT_FAILURE);
     }
     for(int i=0;i<H->table_size;i++){
@@ -70,7 +70,7 @@ extern void put(data_t key,struct hash_map *H)
     if(pos==NULL){
         new_node=(struct node *)malloc(sizeof(struct node));
         if(new_node==NULL){
-            printf("Out of space!\n");
+            SPACE_ERR();
             exit(EXIT_FAILURE);
         }else{
             head=H->list[hash(key,H->table_size)];
@@ -110,13 +110,13 @@ extern struct hashmap_square * init_square_hash(int table_size)
     }
     H=(struct hashmap_square*)malloc(sizeof(struct hashmap_square));
      if(H==NULL){
-        printf("Out of space!\n");
+        SPACE_ERR();
         exit(EXIT_FAILURE);
     }
     H->table_size=next_prime(table_size);
     H->cells=(struct hash_cell*)malloc(sizeof(struct hash_cell)*H->table_size);
     if(H->cells==NULL){
-        printf("Out of space");
+        SPACE_ERR();
         exit(EXIT_FAILURE);
     }
     for(int i=0;i<H->table_size;i++){

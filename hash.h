@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#define SPACE_ERR() printf("out of space! in function %s line:%d \n",__func__,__LINE__)
 /*key 的类型*/
 #define data_t char*
 /*哈希表的最小大小*/
