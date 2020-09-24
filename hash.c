@@ -52,7 +52,7 @@ extern struct node *contain(data_t key,struct hash_map *H)
 {
     struct node *pos;
     struct node *head;
-    head=h->list[hash(key,h->table_size)];
+    head=H->list[hash(key,H->table_size)];
     pos=head->next;
     while(pos!=NULL&&strcmp(key,pos->data)!=0){
         pos=pos->next;
