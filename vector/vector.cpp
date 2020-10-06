@@ -115,3 +115,61 @@ public:
     void traverse(void (*)(T&));
     template <typename VST> void traverse(VST &);
 };
+
+template<typename T>
+void Vector<T>::copy_from(T const* A,Rank lo,Rank hi)
+{
+    __elem=new T[__capacity=(hi-lo)*2];
+    __size=0;
+    while(lo<hi){
+        __elem[size++]=A[lo++];
+    }
+}
+
+template<typename T>
+Vector<T>& Vector<T>::operator=(Vector<T> const& V)
+{
+    if(__elem){
+        delete [] __elem;
+    }
+    copy_from(V.__elem,0,V.size);
+    return *this;
+}
+
+template<typename T>
+void Vector<T>::expand()
+{
+    if(__size<__capacity){
+        return;
+    }
+    __capacity=std::max(__capacity,DEFAULT_CAPACITY);
+    T* old=__elem;
+    __elem=new T[__capacity<<1];
+    for(int i=0;i<__size;i++){
+        __elem[i]=old[i];
+    }
+    delete [] old;
+}
+
+template<typename T>
+void Vector<T>::shrink()
+{
+    if(__size<DEFAULT_CAPACITY<<1){
+        return;
+    }
+    if(__size<<2>__capacity){
+        return;
+    }
+    T *old=__elem;
+    __elem=new T[__capacity>>=1];
+    for(int i=0;i<__size;i++){
+        __elem[i]=old[i];
+    }
+    delete [] old;
+}
+
+template<typename T>
+T& Vector<T>::operator[](Rank r) const
+{
+    return __elem[r];
+}
