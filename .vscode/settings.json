@@ -20,6 +20,7 @@
         "system_error": "cpp",
         "functional": "cpp",
         "tuple": "cpp",
-        "cstdlib": "cpp"
+        "cstdlib": "cpp",
+        "typeinfo": "cpp"
     }
 }
