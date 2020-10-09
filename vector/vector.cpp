@@ -273,5 +273,33 @@ int Vector<T>::d_duplicate()
     }
     return pre_size-__size;
 }
+/*遍历接口:函数指针*/
+template<typename T>
+void Vector<T>::traverse(void(*visit)(T &))
+{
+    for(int i=0;i<__size;i++){
+        visit(__elem[i]);
+    }
+}
+/*遍历接口:函数对象*/
+template<typename T> template<typename VST>
+void Vector<T>::traverse(VST& visit)
+{
+    for(int i=0;i<__size;i++){
+        visit(__elem[i]);
+    }
+}
+template<typename T>
+struct Increase
+{
+    virtual void opertator()(T& e){e++};
+};
+
+template<typename T>
+void increase(Vector<T> & V)
+{
+    V.traverse(Increase<T>());
+}
+
 
 
