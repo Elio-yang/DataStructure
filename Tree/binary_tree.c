@@ -25,6 +25,7 @@ void find_allparent(struct t_node *T);
 
 void delete_node(struct t_node *T, int key);
 void delete_sub(struct t_node *T, int key);
+void delete_tree(struct t_node *T);
 
 int get_hight(struct t_node *T);
 
