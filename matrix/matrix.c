@@ -14,7 +14,7 @@ struct sparse_matrix{
 };
 
 #define INIT(p,row,col) 	do{                                             \
-					for(int i=0;i<row;i++){                 \
+					for(int i=0;i<row;i++){                	\
 						for(int j=0;j<col;j++){         \
 							scanf("%d",*(p+i)+j);   \
 						}                               \
@@ -32,6 +32,7 @@ col_a,row_b,col_b) 		do{                                           	\
 					}                                       \
 				}while(0)
 #define SHOW(p_a,row_a,col_a)   	do{                                                             \
+						printf("matrix "#p_a":\n");				\
 						for(int i=0;i<row_a;i++){                               \
 							for(int j=0;j<col_a;j++){                       \
 								printf("%d ",*(*(p_a+i)+j));            \
@@ -48,11 +49,12 @@ col_a,row_b,col_b) 		do{                                           	\
 						break;							\
 					}while(0)
 #define SHOW_S(p_s,col_s)        	do{								\
+						printf("matrix "#p_s":\n");				\
 						for(int i=0;i<col_s;i++){				\
 							printf("{ ");					\
-							printf("row=%d",p_s[i].row);		\
-							printf("\tcol=%d",p_s[i].col);		\
-							printf("\tval=%d",p_s[i].val);		\
+							printf("row=%d",p_s[i].row);			\
+							printf("\tcol=%d",p_s[i].col);			\
+							printf("\tval=%d",p_s[i].val);			\
 							printf(" }\n");					\
 						}							\
 					}while(0)					
@@ -106,6 +108,28 @@ struct sparse_matrix* map_sparse_matrix(int(*p_s)[Q],int col_s,int*tmp)
 	}
 	return p_m;
 }
+void transpose_sparse_matrix(struct sparse_matrix* p_m,struct sparse_matrix T_m[],int cnt,int col_a,int row_a)
+{
+	int *num=(int*)malloc(sizeof(int)*col_a);
+	memset(num,0,sizeof(int)*col_a);
+	for(int i=0;i<cnt;i++){
+		++num[p_m[i].col-1];
+	}
+	int *pos=(int*)malloc(sizeof(int)*col_a);
+	int row_b=col_a;
+	pos[0]=0;
+	for(int i=1;i<row_b;i++){
+		pos[i]=pos[i-1]+num[i-1];
+	}
+	for(int i=0;i<cnt;i++){
+		int index1=p_m[i].col-1;
+		int index2=pos[index1];
+		T_m[index2].col=p_m[i].row;
+		T_m[index2].row=p_m[i].col;
+		T_m[index2].val=p_m[i].val;
+		++pos[index1];
+	}
+}
 int main()
 {
 	int A[M][P];
@@ -148,7 +172,10 @@ int main()
 	struct sparse_matrix *map_sparse=map_sparse_matrix(sparse_matrix,Q,&cnt);
 	SHOW(sparse_matrix,Q,Q);
 	SHOW_S(map_sparse,cnt);
-
+	/*transpose of sparse matrix*/
+	struct sparse_matrix t_map_sparse[cnt];
+	transpose_sparse_matrix(map_sparse,t_map_sparse,cnt,Q,Q);
+	SHOW_S(t_map_sparse,cnt);
 	system("pause");
 	return 0;
 }
