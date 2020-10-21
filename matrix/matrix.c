@@ -32,14 +32,6 @@ col_a,row_b,col_b) 		do{                                           	\
 					}                                       \
 				}while(0)
 #define SHOW(p_a,row_a,col_a)   	do{                                                             \
-						printf("matrix "#p_a":\n");				\
-						if(row_a==1){						\
-							for(int i=0;i<col_a;i++){			\
-								printf("%d ",*(p_a+i));			\
-							}						\
-							printf("\n");					\
-							break;						\
-						}                             				\
 						for(int i=0;i<row_a;i++){                               \
 							for(int j=0;j<col_a;j++){                       \
 								printf("%d ",*(*(p_a+i)+j));            \
@@ -55,12 +47,13 @@ col_a,row_b,col_b) 		do{                                           	\
 						printf("\n");						\
 						break;							\
 					}while(0)
-#define SHOW_S(p_s,col_a)        	do{								\
-						for(int i=0;i<Q;i++){					\
-							printf("{\n");					\
-							printf("\trow=%d\n",p_s[i].row);		\
-							printf("\tcol=%d\n",p_s[i].col);		\
-							printf("\tval=%d\n",p_s[i].val);		\
+#define SHOW_S(p_s,col_s)        	do{								\
+						for(int i=0;i<col_s;i++){				\
+							printf("{ ");					\
+							printf("row=%d",p_s[i].row);		\
+							printf("\tcol=%d",p_s[i].col);		\
+							printf("\tval=%d",p_s[i].val);		\
+							printf(" }\n");					\
 						}							\
 					}while(0)					
 #define MAKE_EMPTY(p_a,row_a,col_a)     do{								\
@@ -81,37 +74,38 @@ col_a,row_b,col_b) 		do{                                           	\
 					}while(0)
 #define MAP_SYMMETRIC_MATRIX(p_s,p_m,col_s)	do{							\
 						for(int i=1;i<=col_s;i++){				\
-							for(int j=i;j<=col_s;j++){			\
+							for(int j=1;j<=i;j++){				\
 								int index=i*(i-1)/2+(j-1);		\
 								*(p_m+index)=*(*(p_s+i-1)+j-1);		\
 							}						\
 						}							\
 					}while(0)
-#define MAP_SPARSE_MATRIX(p_s,p_m,col_s,cnt)	do{\
-							int tmp;					\
-							for(int i=0;i<col_s;i++){			\
-								for(int j=0;j<col_s;j++){		\
-									if((*(*p_s+i)+j)!=0){		\
-										++tmp;			\
-									}				\
-								}					\
-							}						\
-							cnt=tmp;					\
-							p_m=(struct sparse_matrix*)			\
-							malloc(sizeof(struct sparse_matrix)*tmp);   	\
-							int l=0;					\
-							for(int i=0;i<col_s;i++){			\
-								for(int j=0;j<col_s;j++){		\
-									if((*(*p_s+i)+j)!=0){		\
-										p_m[l].row=i;		\
-										p_m[l].col=j;		\
-										p_m[l].val=		\
-										*((*p_s+i)+j);		\
-									}				\
-								}					\
-							}						\
-						}while(0)
-
+struct sparse_matrix* map_sparse_matrix(int(*p_s)[Q],int col_s,int*tmp)
+{
+	int cnt=0;
+	for(int i=0;i<col_s;i++){
+		for(int j=0;j<col_s;j++){
+			if(*(*(p_s+i)+j)!=0){
+				++cnt;
+			}
+		}
+	}
+	*tmp=cnt;
+	struct sparse_matrix* p_m;
+	p_m=(struct sparse_matrix*)malloc(sizeof(struct sparse_matrix)*cnt);
+	int t=0;
+	for(int i=0;i<col_s;i++){
+		for(int j=0;j<col_s;j++){
+			if(*(*(p_s+i)+j)!=0){
+				p_m[t].row=i+1;
+				p_m[t].col=j+1;
+				p_m[t].val=*(*(p_s+i)+j);
+				t++;
+			}
+		}
+	}
+	return p_m;
+}
 int main()
 {
 	int A[M][P];
@@ -133,34 +127,28 @@ int main()
 	SHOW(D,N,N);
 	SHOW_O(E,N);
 	/*compress triangle matrix*/
-	int tri_M[N][N];
-	INIT(tri_M,5,5);
-	int all=N*(N+1)/2;
+	int tri_M[Q][Q];
+	INIT(tri_M,Q,Q);
+	int all=Q*(Q+1)/2;
 	int map_tri_M[all];
-	MAP_TRIANGLE_MATRIX(tri_M,map_tri_M,N);
-	SHOW(tri_M,N,N);
+	MAP_TRIANGLE_MATRIX(tri_M,map_tri_M,Q);
+	SHOW(tri_M,Q,Q);
 	SHOW_O(map_tri_M,all);
 	/*compress symmetric matrix*/
-	int sym_M[N][N];
-	INIT(sym_M,5,5);
+	int sym_M[Q][Q];
+	INIT(sym_M,Q,Q);
 	int map_sym_M[all];
-	MAP_SYMMETRIC_MATRIX(sym_M,map_sym_M,N);
-	SHOW(sym_M,N,N);
-	SHOW_O(map_sym_M,N);
+	MAP_SYMMETRIC_MATRIX(sym_M,map_sym_M,Q);
+	SHOW(sym_M,Q,Q);
+	SHOW_O(map_sym_M,all);
 	/*compress sparse matrix*/
 	int sparse_matrix[Q][Q];
 	INIT(sparse_matrix,Q,Q);
-	struct sparse_matrix *map_sparse;
 	int cnt=0;
-	MAP_SPARSE_MATRIX(sparse_matrix,map_sparse,Q,cnt);
+	struct sparse_matrix *map_sparse=map_sparse_matrix(sparse_matrix,Q,&cnt);
 	SHOW(sparse_matrix,Q,Q);
 	SHOW_S(map_sparse,cnt);
-	
-	
 
-
-	
-
-
+	system("pause");
 	return 0;
 }
