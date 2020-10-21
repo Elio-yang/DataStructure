@@ -110,23 +110,31 @@ struct sparse_matrix* map_sparse_matrix(int(*p_s)[Q],int col_s,int*tmp)
 }
 void transpose_sparse_matrix(struct sparse_matrix* p_m,struct sparse_matrix T_m[],int cnt,int col_a,int row_a)
 {
+	/*num存每列的非0元个数，不能大小是cnt，cnt中每个元素的列数可能比cnt大*/
 	int *num=(int*)malloc(sizeof(int)*col_a);
 	memset(num,0,sizeof(int)*col_a);
+	/*列数从0开始*/
 	for(int i=0;i<cnt;i++){
 		++num[p_m[i].col-1];
 	}
+	/*原稀疏矩阵中每列的第一个非0元在转置后的矩阵（数组中）是第几个*/
 	int *pos=(int*)malloc(sizeof(int)*col_a);
 	int row_b=col_a;
 	pos[0]=0;
+	/*比如第2列的第一个非0元的位置，就是第一列第一个非0元的位置，加上第一列非0元的个数*/
 	for(int i=1;i<row_b;i++){
 		pos[i]=pos[i-1]+num[i-1];
 	}
 	for(int i=0;i<cnt;i++){
+		/*列数从0开始*/
 		int index1=p_m[i].col-1;
+		/*列数为index1的这个元素的位置*/
 		int index2=pos[index1];
+		/*进行转置*/
 		T_m[index2].col=p_m[i].row;
 		T_m[index2].row=p_m[i].col;
 		T_m[index2].val=p_m[i].val;
+		/*列数为index1的元素的位置＋1*/
 		++pos[index1];
 	}
 }
