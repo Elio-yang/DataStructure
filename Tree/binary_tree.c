@@ -18,6 +18,7 @@ void in_order_iter(struct t_node *T);
 void post_order(struct t_node *T);
 void post_order_iter(struct t_node *T);
 void level_order(struct t_node *T);
+void level_num(struct t_node*T);
 
 struct t_node *find_node(struct t_node *T, int key);
 struct t_node *find_parent(struct t_node *T, int key);
@@ -28,5 +29,9 @@ void delete_sub(struct t_node *T, int key);
 void delete_tree(struct t_node *T);
 
 int get_hight(struct t_node *T);
+int get_hight_node(struct t_node *T, struct t_node *v);
 
+int main()
+{
 
+}
