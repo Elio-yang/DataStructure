@@ -1,14 +1,18 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
-using namespace std;
+#include <vector>
 
+using namespace std;
+vector<int> index;
 #define maxn 100010
 
 int* build_next(char *P);
 int* build_next_improve(char *P);
 int KMP(char *T,char *P);
 int* build_fail(char *p);
+int KMP_byfail(char *T,char *P);
+void KMP_nostop(char *T,char *P);
 
 int main()
 {
@@ -42,7 +46,9 @@ int main()
 
     int pos=KMP(txt,pat);
     cout<<pos<<endl;
-
+    int pos2=KMP_byfail(txt,pat);
+    cout<<pos2<<endl;
+    
     system("pause");
     return 0;
 }
@@ -118,5 +124,50 @@ int KMP(char * T, char * P)
     }
     else {
        return -1;
+    }
+}
+void KMP_nostop(char *T,char *P)
+{
+    int m=strlen(P);
+    int n=strlen(T);
+    int *next_table=build_next(P);
+    int i=0;
+    int j=0;
+    while(i<n){
+        if(j<0||P[j]==T[i]){
+            j++;
+            i++;
+        }else{
+            j=next_table[j];
+        }
+        if(j==m){
+            index.push_back(i-j);
+            j=next_table[j-1];
+            i--;
+        }
+    }
+}
+int KMP_byfail(char *T,char *P)
+{
+    int m=strlen(P);
+    int n=strlen(T);
+    int *fail_table=build_fail(P);
+    int i=0;
+    int j=0;
+    while(i<n&&j<m){
+        if(T[i]==P[j]){
+            i++;j++;
+        }
+        else if(j==0){
+            i++;
+        }
+        else{
+            j=fail_table[j-1]+1;
+        }
+    }
+    if(j==m){
+        return i-j;
+    }else{
+        return -1;
     }
 }
