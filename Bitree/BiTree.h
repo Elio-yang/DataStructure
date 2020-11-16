@@ -60,8 +60,6 @@ public:
         }
 
         int remove(pNode(T)x);
-
-        BiTree<T>*
 };
 
 template<typename T>
