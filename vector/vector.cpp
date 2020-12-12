@@ -1,305 +1,172 @@
-#include <iostream>
-#define DEFAULT_CAPACITY 3
-using Rank=int;
+#include <string>
+#include<cassert>
+using namespace std;
 
-template<typename T>
-class Vector{
-protected:
-    /*规模，容量，数据区*/
-    Rank __size;
-    int  __capacity;
-    T   *__elem;
-
-    /*复制区域A[lo,hi)*/
-    void copy_from(T const *A,Rank lo,Rank hi);
-    /*扩容*/
-    void expand();
-    /*压缩*/
-    void shrink();
-    /*选取最大元素*/
-    Rank max(Rank lo,Rank hi);
-    /*扫描交换*/
-    bool bubble(Rank lo,Rank hi);
-    /*冒泡排序*/
-    void bubble_sort(Rank lo,Rank hi);
-    /*选择排序*/
-    void selection_sort(Rank lo,Rank hi);
-    /*归并算法*/
-    void merge(Rank lo,Rank mi,Rank hi);
-    /*归并排序*/
-    void merge_sort(Rank lo,Rank hi);
-    /*轴点构造算法*/
-    Rank partition(Rank lo,Rank hi);
-    /*快速排序*/
-    void quick_sort(Rank lo,Rank hi);
-    /*堆排序*/
-    void heap_sort(Rank lo,Rank hi);
+typedef unsigned int  size_t;
+template < class T>
+class vector {
 public:
-/*===========================================================================*/
-    /*
-     *构造函数
-     */
-    Vector(int c=DEFAULT_CAPACITY,int s=0,T v=0)
-    {
-        __elem=new T[__capacity=c];
-        for(__size=0;__size<s;__elem[__size++]=v);
-    }
-    Vector(T const *A,Rank n)
-    {
-        copy_from(A,0,n);
-    }
-    Vector(T const *A,Rank lo,Rank hi)
-    {
-        copy_from(A,lo,hi);
-    }
-    Vector(Vector<T> const &V)
-    {
-        copy_from(V.__elem,0,V.__size);
-    }
-    Vector(Vector<T> const &V,Rank lo,Rank hi)
-    {
-        copy_from(V.__elem,lo,hi);
+        typedef T * iterator;
 
-    }
-/*===========================================================================*/
-    /*析构函数*/
-    ~Vector()
-    {
-        delete [] __elem;
-    }
-/*===========================================================================*/
-    /*只读访问接口*/
-    Rank size() const
-    {
-        return __size;
-    }
-    bool empty()
-    {
-        return !__size;
-    }
-    int disorder() const;
-    Rank find(T const &e) const
-    {
-        return find(e,0,__size);
-    }
-    Rank find(T const &e,Rank lo,Rank hi) const;
-    Rank search(T const &e) const
-    {
-        return (0>=__size)?(-1):search(e,0,__size);
-    }
-    Rank search(T const &e,Rank lo,Rank hi) const;
-    bool equal(Vector<T> V) const;
-/*===========================================================================*/
-    /*可写访问接口*/
-    T& operator [](Rank r) const;
-    Vector<T>& operator=(Vector<T> const&);
-    bool operator==(Vector<T> V) const;
-    T remove(Rank r);
-    int remove(Rank lo, Rank hi);
-    Rank insert(Rank r,T const &e);
-    Rank insert(T const &e)
-    {
-        return insert(__size,e);
-    }
-    void sort(Rank lo,Rank hi);
-    void sort()
-    {
-        sort(0,__size);
-    }
-    void unsort(Rank lo,Rank hi)
-    void unsort()
-    {
-        sort(0,__size);
-    }
-    int uniquify();
-    int d_duplicate();
-/*===========================================================================*/
-    /*遍历*/
-    void traverse(void (*)(T&));
-    template <typename VST> void traverse(VST &);
+        vector();
+        vector(int size, T const& a);
+        vector(const vector<T> & a);
+        ~vector();
+        size_t size() const;
+        size_t capacity() const;
+        size_t max_capacity() const;
+        void push_back(const T& val);
+        void pop_back();
+        T& operator[](int index);
+        vector<T>& operator=(const vector<T>& a);
+        bool empty() const;
+        iterator begin() const;
+        iterator end() const;
+private:
+        size_t  _size;
+        size_t  _capacity;
+        T*      _buf;
+        const size_t _max_capacity = 65536;
 };
-
-template<typename T>
-void Vector<T>::copy_from(T const* A,Rank lo,Rank hi)
+template<class T>
+vector<T>::vector()
 {
-    __elem=new T[__capacity=(hi-lo)*2];
-    __size=0;
-    while(lo<hi){
-        __elem[size++]=A[lo++];
-    }
-}
-/*重载赋值(=)运算符*/
-template<typename T>
-Vector<T>& Vector<T>::operator=(Vector<T> const& V)
-{
-    if(__elem){
-        delete [] __elem;
-    }
-    copy_from(V.__elem,0,V.size);
-    return *this;
-}
-/*数组扩容*/
-template<typename T>
-void Vector<T>::expand()
-{
-    if(__size<__capacity){
-        return;
-    }
-    /*不低于最低容量*/
-    __capacity=std::max(__capacity,DEFAULT_CAPACITY);
-    T* old=__elem;
-    /*扩容至两倍*/
-    __elem=new T[__capacity<<1];
-    for(int i=0;i<__size;i++){
-        __elem[i]=old[i];
-    }
-    delete [] old;
+        _size = 0;
+        _buf = new T[1];
+        _capacity = 1;
 }
 
-template<typename T>
-void Vector<T>::shrink()
+template<class T>
+vector<T>::vector(int s, const T& a)
 {
-    /*不至于缩小至DEFAULT一下*/
-    if(__size<DEFAULT_CAPACITY<<1){
-        return;
-    }
-    /*factor=__size/__cap > 1/2
-       when shrink factor > 1/4
-       以25%的装载因子为界限
-    */
-    if(__size<<2>__capacity){ 
-        return;
-    }
-    T *old=__elem;
-    /*缩小至一半*/
-    __elem=new T[__capacity>>=1];
-    for(int i=0;i<__size;i++){
-        __elem[i]=old[i];
-    }
-    delete [] old;
-}
-/*重载取下标运算符([])*/
-template<typename T>
-T& Vector<T>::operator[](Rank r) const
-{
-    return __elem[r];
-}
-/*洗牌算法(等概率)，向量整体置乱算法*/
-template<typename T>
-void Vector<T>::unsort(Rank lo,Rank hi)
-{
-    /*新的向量v[0,hi-lo)*/
-    T *v=__elem+lo;
-    for(Rank i=hi-lo;i>0;i--){
-        std::swap(v[i-1],v[rand()%i]);
-    }
-}
-/*判断是否相等*/
-template<typename T>
-bool Vector<T>::equal(Vector<T> V) const
-{
-    if(__size!=V.size()){
-        return false;
-    }
-    for(int i=0;i<__size;i++){
-        if(__elem[i]!=V.__elem[i]){
-            return false;
+        if (s > _max_capacity) {
+                s = _max_capacity;
         }
-    }
-    return true;
-}
-/*重载判断是否相等运算符(==)*/
-template<typename T>
-bool Vector<T>::operator==(Vector<T> V) const
-{
-    if(__size!=V.size()){
-        return false;
-    }
-    for(int i=0;i<__size;i++){
-        if(__elem[i]!=V.__elem[i]){
-            return false;
+        _size = s;
+        _capacity = 1;
+        while (_capacity < _size) {
+                _capacity *= 2;
         }
-    }
-    return true;
+        _buf = new T[_capacity];
+        for (size_t i = 0; i < _size; i++) {
+                _buf[i] = a;
+        }
 }
-/*无序查找*/
-template<typename T>
-Rank Vector<T>::find(T const &e,Rank lo,Rank hi) const
+template<class T>
+vector<T>::vector(const vector<T> & a)
 {
-    while((lo<hi--)&&(e!=__elem[i]));
-    return (hi<lo)?(-1):hi;
+        _size = a._size;
+        _capacity = a._capacity;
+        _buf = new T[_capacity];
+        for (size_t i = 0; i < _size; i++) {
+                _buf[i] = a._buf[i];
+        }
 }
-template<typename T>
-Rank Vector<T>::insert(Rank r,T const& e)
+template<class T>
+vector<T>::~vector()
 {
-    /*第一步，是否需要扩容*/
-    expand();
-    for(int i=__size;i>r;i--){
-        __elem[i]=__elem[i-1];
-    }
-    __elem[r]=e;
-    __size++;
-    return r;
-}
-template<typename T>
-Rank Vector<T>::remove(Rank lo,Rank hi)
-{
-    if(lo==hi) return 0;
-    while(hi<__size){
-        __elem[lo++]=__elem[hi++];
-    }
-    /*[lo,...)丢弃，故__size=lo*/
-    __size=lo;
-    shrink();
-    /*返回被删除的元素个数*/
-    return hi-lo;
-}
-/*单个的删除会调用区间长为1的删除*/
-template<typename T>
-T Vector<T>::remove(Rank r)
-{
-    T tmp=__elem[r];
-    remove(r,r+1);
-    return tmp;
-}
-/*无序数组删除重复元素*/
-template<typename T>
-int Vector<T>::d_duplicate()
-{
-    int pre_size=__size;
-    Rank i=1;
-    while(i<__size){
-        (find(__elem[i],0,i)<0)?(r++):remove(r);
-    }
-    return pre_size-__size;
-}
-/*遍历接口:函数指针*/
-template<typename T>
-void Vector<T>::traverse(void(*visit)(T &))
-{
-    for(int i=0;i<__size;i++){
-        visit(__elem[i]);
-    }
-}
-/*遍历接口:函数对象*/
-template<typename T> template<typename VST>
-void Vector<T>::traverse(VST& visit)
-{
-    for(int i=0;i<__size;i++){
-        visit(__elem[i]);
-    }
-}
-template<typename T>
-struct Increase
-{
-    virtual void opertator()(T& e){e++};
-};
-
-template<typename T>
-void increase(Vector<T> & V)
-{
-    V.traverse(Increase<T>());
+        delete[] _buf;
 }
 
+template<class T>
+size_t vector<T>::size() const
+{
+        return _size;
+}
 
+template<class T>
+size_t vector<T>::capacity() const
+{
+        return _capacity;
+}
+template<class T>
+size_t vector<T>::max_capacity() const
+{
+        return _max_capacity;
+}
+template<class T>
+T& vector<T>::operator[](int index)
+{
+        assert(index >= 0 && index < _size);
+        return _buf[index];
+}
 
+template<class T>
+void vector<T>::push_back(const T& val)
+{
+        if (_size < _capacity) {
+                _buf[_size] = val;
+                _size++;
+                return ;
+        } else if (_size == _max_capacity) {
+                return ;
+        }
+        _capacity *= 2;
+        if (_capacity >= _max_capacity) {
+                _capacity = _max_capacity;
+        }
+        T * tmp = new T[_capacity];
+        for (size_t i = 0; i < _size; i++) {
+                tmp[i] = _buf[i];
+        }
+        tmp[_size] = val;
+        _size++;
+        delete[] _buf;
+        _buf = tmp;
+}
+
+template<class T>
+void vector<T>::pop_back()
+{
+        assert(_size > 0);
+        _size--;
+}
+template<class T>
+bool vector<T>::empty() const
+{
+        if (_size == 0) {
+                return true;
+        }
+        return false;
+}
+// 迭代器的实现
+template<class T>
+typename vector<T>::iterator vector<T>::begin() const
+{
+        return _buf;
+}
+template<class T>
+typename vector<T>::iterator vector<T>::end() const
+{
+        return _buf + _size;
+}
+template<class T>
+vector<T>& vector<T>::operator=(const vector<T> & a)
+{
+        if (this == &a) {
+                return *this ;
+        }
+        delete[] _buf;
+        _size = a._size;
+        _capacity = a._capacity;
+        _buf = new T[_capacity];
+        for (size_t i = 0; i < _size; i++) {
+                _buf[i] = a._buf[i];
+        }
+        return *this;
+}
+
+int main()
+{
+        int c = 20;
+        vector<string> a;
+        vector<string> b;
+        for (int i = 0 ; i < 3; i++) {
+                a.push_back("hello");
+        }
+        b = a;
+        for (vector<string>::iterator it = b.begin(); it != b.end(); it++) {
+                cout << *it << " " << endl;
+        }
+        return 0;
+}

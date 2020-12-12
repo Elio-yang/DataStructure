@@ -181,7 +181,7 @@ inline record_root *build_record(H_root *h_t) {
 	re_code_txt(recd, h_t->_root, re_code_table, k);
 	return recd;
 }
-int mycmy(const void *a, const void *b) {
+int my_cmp(const void *a, const void *b) {
 	int v1 = ((data*)a)->cnt;
 	int v2 = ((data*)b)->cnt;
 	int p1 = ((data*)a)->pos;
@@ -252,7 +252,7 @@ int main() {
 			code = recd_node->recode;
 		}
 	}
-	qsort(order, index, sizeof(data), mycmy);
+        qsort(order, index, sizeof(data), my_cmp);
 	int flag = bits & 0x7;
 	printf("%d %d\n", len,flag?((bits>>3)+1):(bits>>3));
 	for (int i = 0; i < 26; i++) {

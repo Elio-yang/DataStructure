@@ -1,11 +1,15 @@
-cmake_minimum_required(VERSION 3.17)
-project(DataStructure)
+cmake_minimum_required(VERSION 3.15)
+project(DSA)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(Bitree Bitree/main.cpp Bitree/Implementation.h Bitree/BiNode_macro.h Bitree/std.h Bitree/BiTree.h)
+# 遍历项目(三级目录)所有的 .cpp 文件
+#file (GLOB files *.cpp */*.cpp */*/*.cpp )
+file (GLOB_RECURSE files *.cpp)
+foreach (file ${files})
+    string(REGEX REPLACE ".+/(.+)\\..*" "\\1" exe ${file})
+    add_executable (${exe} ${file})
+    message (\ \ \ \ --\ src/${exe}.cpp\ will\ be\ compiled\ to\ bin/${exe})
+endforeach ()
 
-add_executable(List List_d/ListNode.h List_d/ListNode_implementation.h List_d/List.h List_d/List_implementation.h List_d/main.cpp)
-
-add_executable(hafman Tree/HuffmanTree.cpp)
-
+#file (GLOB_RECURSE files *.cpp)
